@@ -1,31 +1,30 @@
 package repository
 
 import (
-    "database/sql"
-    "fmt"
-	"log"
+	"database/sql"
+	"fmt"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "bot_user"
-	password = "12345"
-	dbname   = "trip-data"
-)  
+var (
+	host     string = "localhost"
+	port     int    = 5432
+	user     string = "bot_user"
+	password string = "12345"
+	dbname   string = "trip-data"
+)
 
-func ConnectToDB() *sql.DB {
+func ConnectToDB() (*sql.DB, error) {
 	db, err := sql.Open("postgres", initConnection())
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }
 
 func initConnection() string {

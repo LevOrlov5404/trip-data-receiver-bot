@@ -6,60 +6,38 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
-	"github.com/LevOrlov5404/trip-data-receiver-bot/repository"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/handlers"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
+	// "github.com/LevOrlov5404/trip-data-receiver-bot/repository"
 	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	_ "github.com/lib/pq"
 )
 
-type (
-	UserMessageHandler func(message *tgbotapi.Message, user *User) (replyMsg string, err error)
-	User struct{
-		Id int
-		CurrentMessageHandler UserMessageHandler
-	}
-	Users map[int]*User
-)
-
 var (
-	telegramBotToken string = "1273007508:AAH_hqU_qFimVVv1OW5jYdJmgbfqhCr-2-g"
-	defaultMessageHandler = func(message *tgbotapi.Message, user *User) (replyMsg string, err error) {return}
-	users Users = Users{}
+	telegramBotToken string       = "1273007508:AAH_hqU_qFimVVv1OW5jYdJmgbfqhCr-2-g"
+	users            models.Users = models.Users{}
 )
 
-func CreateUser(id int) *User {
-	return &User{
-		Id: id,
-		CurrentMessageHandler: defaultMessageHandler,
+func sendMessageToChatIdByBot(message string, chatID int64, bot *tgbotapi.BotAPI) {
+	msg := tgbotapi.NewMessage(chatID, message)
+	_, err := bot.Send(msg)
+	if err != nil {
+		log.Printf("не удалось отправить сообщение по причине: %v", err)
 	}
-}
-
-func handleTextMessage(message *tgbotapi.Message, users Users) (replyMsg string, err error) {
-	requestMsg := message.Text
-	userInfo := message.From
-	
-	if strings.Contains(requestMsg, "Привет") || strings.Contains(requestMsg, "привет") || strings.Contains(requestMsg, "/start") {
-		replyMsg = "Привет. Я бот, принимающий данные о командировке. Напиши /help"
-	} else if requestMsg == "/help" {
-		replyMsg = "Вначале зарегистрируйся, если еще не сделал этого. Затем можно отправлять данные о командировке.\n"+
-			"Зарегистрироваться: /registrate\n"+
-			"Отправить отчет: /report"
-	} else if requestMsg == "/registrate" {
-		if _, ok := users[userInfo.ID]; !ok {
-			users[userInfo.ID] = CreateUser(userInfo.ID)
-		}
-	} else if requestMsg == "/report" {
-		replyMsg = "smth with report"
-	} else {
-		replyMsg = "Не знаю, как ответить"
-	}
-	return
 }
 
 func main() {
-	db := repository.ConnectToDB()
-	defer db.Close()
+	// db, err := repository.ConnectToDB()
+	// defer db.Close()
+
+	// err = repository.AddUser(db, 0, "levchik")
+	// fmt.Println(err)
+
+	// dbUser, err := repository.GetUser(db, 0)
+	// fmt.Println(err)
+	// fmt.Println(dbUser)
+	// return
 
 	bot, err := tgbotapi.NewBotAPI(telegramBotToken)
 	if err != nil {
@@ -78,20 +56,42 @@ func main() {
 			continue
 		}
 
+		if _, ok := users[update.Message.From.ID]; !ok {
+			users[update.Message.From.ID] = models.CreateUser(update.Message.From.ID)
+		}
+
 		if update.Message.Text != "" {
-			replyMsg, err := handleTextMessage(update.Message, users)
-			if err != nil {
-				log.Printf("не удалось обработать сообщение пользователя по причине: %v", err)
-				return
+			replyMsg := ""
+
+			user := users[update.Message.From.ID]
+			if user.MessageHandlersArray != nil {
+				replyMsg, err = user.MessageHandlersArray[user.MessageHandlerNum](update.Message, user)
+				if err != nil {
+					if clientErr, ok := err.(models.ClientError); ok {
+						replyMsg = clientErr.Error()
+					} else {
+						log.Printf("не удалось обработать сообщение пользователя по причине: %v", err)
+						replyMsg = "Внутренняя ошибка. Попробуйте позже."
+					}
+				} else {
+					if user.MessageHandlerNum < len(user.MessageHandlersArray) {
+						user.MessageHandlerNum++
+					} else {
+						user.MessageHandlersArray = nil
+						user.MessageHandlerNum = 0
+					}
+					user.CurrentFail = 0
+				}
+			} else {
+				replyMsg, err = handlers.HandleTextMessage(update.Message, user)
+				if err != nil {
+					log.Printf("не удалось обработать сообщение пользователя по причине: %v", err)
+					replyMsg = "Внутренняя ошибка. Попробуйте позже."
+				}
 			}
 
-			// replyMsg = fmt.Sprintf("%s %d %s", update.Message.From.UserName, update.Message.From.ID, replyMsg)
 			if replyMsg != "" {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, replyMsg)
-				_, err := bot.Send(msg)
-				if err != nil {
-					log.Printf("не удалось отправить сообщение по причине: %v", err)
-				}
+				sendMessageToChatIdByBot(replyMsg, update.Message.Chat.ID, bot)
 			}
 		} else if update.Message.Document != nil {
 			getFileURL, err := bot.GetFileDirectURL(update.Message.Document.FileID)
