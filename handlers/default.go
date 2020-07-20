@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
-	tgbotapi "github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 // type smth struct {
@@ -20,17 +20,19 @@ import (
 func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, error) {
 	requestMsg := message.Text
 
-	if strings.Contains(requestMsg, "Привет") || strings.Contains(requestMsg, "привет") || strings.Contains(requestMsg, "/start") {
-		return "Привет. Я бот, принимающий данные о командировке. Напиши /help", nil
+	reqMsgLowerCase := strings.ToLower(requestMsg)
+	if strings.Contains(reqMsgLowerCase, "привет") || strings.Contains(reqMsgLowerCase, "доров") ||
+		strings.Contains(reqMsgLowerCase, "добрый день") || strings.Contains(requestMsg, "/start") {
+		return "Добрый день. Я бот, принимающий данные о командировке. Напишите /help", nil
 	}
 
 	if requestMsg == "/help" {
-		return "Вначале зарегистрируйся, если еще не сделал этого. Затем можно отправлять данные о командировке.\n" +
-			"Зарегистрироваться: /registrate\n" +
+		return "Вначале зарегистрируйтесь, если еще не сделали этого. Затем можно отправлять данные о командировке.\n" +
+			"Зарегистрироваться: /reg\n" +
 			"Отправить отчет: /report", nil
 	}
 
-	if requestMsg == "/registrate" {
+	if requestMsg == "/reg" {
 		if user.Registrated {
 			return "Вы уже зарегистрированы.", nil
 		}
@@ -44,5 +46,5 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 		return "smth with report", nil
 	}
 
-	return /*"Не знаю, как ответить"*/"", nil
+	return /*"Не знаю, как ответить"*/ "", nil
 }

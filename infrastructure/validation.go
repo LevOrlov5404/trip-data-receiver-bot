@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	onlyRussianSymbolsPattern = `^[-А-Яа-яё]*$`
+	onlyRussianSymbolsPattern = `^[-А-Яа-яё]+$`
 )
 
 func CheckStrHasOnlyRuSymbols(str string) bool {

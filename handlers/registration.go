@@ -7,7 +7,7 @@ import (
 	"github.com/LevOrlov5404/trip-data-receiver-bot/infrastructure"
 	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
 	"github.com/LevOrlov5404/trip-data-receiver-bot/repository"
-	tgbotapi "github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 var registrationHandlers []models.UserMessageHandler
@@ -43,6 +43,7 @@ func GetFullNameToRegistrate(message *tgbotapi.Message, user *models.User) (stri
 	if dbUser != nil {
 		user.FullName = *dbUser.FullName
 		user.MessageHandlerNum = len(user.MessageHandlersArray)
+		user.Registrated = true
 		return "Проверил, вы есть в базе. Значит вы уже зарегистрированы.", nil
 	}
 

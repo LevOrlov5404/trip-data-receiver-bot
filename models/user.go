@@ -1,7 +1,7 @@
 package models
 
 import (
-	tgbotapi "github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type (

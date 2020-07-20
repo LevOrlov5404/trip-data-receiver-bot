@@ -9,8 +9,9 @@ import (
 
 	"github.com/LevOrlov5404/trip-data-receiver-bot/handlers"
 	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
+
 	// "github.com/LevOrlov5404/trip-data-receiver-bot/repository"
-	tgbotapi "github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	_ "github.com/lib/pq"
 )
 
@@ -74,7 +75,7 @@ func main() {
 						replyMsg = "Внутренняя ошибка. Попробуйте позже."
 					}
 				} else {
-					if user.MessageHandlerNum < len(user.MessageHandlersArray) {
+					if user.MessageHandlerNum < len(user.MessageHandlersArray) - 1 {
 						user.MessageHandlerNum++
 					} else {
 						user.MessageHandlersArray = nil
