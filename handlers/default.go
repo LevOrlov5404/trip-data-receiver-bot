@@ -42,7 +42,12 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 		return "Напишите ФИО (через пробел, по-русски).", nil
 	}
 
-	if requestMsg == "/report" {
+	if requestMsg == "/report_start" {
+		if user.Registrated {
+			return "Похоже вы не зарегистрированы. Пройдите процедуру регистрации: /reg", nil
+		}
+		// user.MessageHandlersArray = smth
+
 		return "smth with report", nil
 	}
 

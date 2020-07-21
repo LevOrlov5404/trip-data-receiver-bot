@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
 )
@@ -29,8 +30,26 @@ func GetUser(db *sql.DB, userTelegramId int) (*models.DbUser, error) {
 	return &dbUser, nil
 }
 
-func AddUser(db *sql.DB, userTelegramId int, userFullName string) (error) {
-	_, err := db.Exec("select * from user_add($1, $2)", userTelegramId, userFullName)
+func AddUser(db *sql.DB, userTelegramID int, userFullName string) (error) {
+	_, err := db.Exec("select * from user_add($1, $2)", userTelegramID, userFullName)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func TripInfoStartAdd(db *sql.DB, userTelegramID int, date time.Time, km int, filePath string) (error) {
+	_, err := db.Exec("select * from trip_info_start_add($1, $2, $3, $4)", userTelegramID, date, km, filePath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func TripInfoFinishAdd(db *sql.DB, tripInfoID int, date time.Time, km int, filePath string) (error) {
+	_, err := db.Exec("select * from trip_info_finish_add($1, $2, $3, $4)", tripInfoID, date, km, filePath)
 	if err != nil {
 		return err
 	}

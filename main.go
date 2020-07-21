@@ -6,11 +6,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/LevOrlov5404/trip-data-receiver-bot/handlers"
 	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
 
-	// "github.com/LevOrlov5404/trip-data-receiver-bot/repository"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	_ "github.com/lib/pq"
 )
@@ -29,16 +30,20 @@ func sendMessageToChatIdByBot(message string, chatID int64, bot *tgbotapi.BotAPI
 }
 
 func main() {
-	// db, err := repository.ConnectToDB()
-	// defer db.Close()
+	db, err := repository.ConnectToDB()
+	defer db.Close()
+
+	// err = repository.TripInfoStartAdd(db, 0, time.Now(), 123, "lol")
+	// fmt.Println(err)
+	err = repository.TripInfoFinishAdd(db, 5, time.Now(), 123, "lol")
+	fmt.Println(err)
 
 	// err = repository.AddUser(db, 0, "levchik")
 	// fmt.Println(err)
-
 	// dbUser, err := repository.GetUser(db, 0)
 	// fmt.Println(err)
 	// fmt.Println(dbUser)
-	// return
+	return
 
 	bot, err := tgbotapi.NewBotAPI(telegramBotToken)
 	if err != nil {
