@@ -41,8 +41,7 @@ func GetAnswerToWriteTripInfoFinish(bot *tgbotapi.BotAPI, message *tgbotapi.Mess
 		return "", nil
 	}
 
-	// filePath := "/home/lev/Documents/ImageReceiverBotDocuments/"+user.FullName+"/"+ time.Now().Format("01_02_2006_15_04_05")
-	filePath , err := infrastructure.NewUserFile(fileBytes, user.FullName, time.Now().Format("01_02_2006_15_04_05"))
+	filePath, err := infrastructure.NewUserFile(fileBytes, user.FullName+"/Конец поездки", time.Now().Format("01_02_2006_15_04_05"))
 	if err != nil {
 		return "", err
 	}

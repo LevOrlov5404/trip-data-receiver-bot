@@ -43,7 +43,7 @@ func GetAnswerToContinueStartOrFinish(bot *tgbotapi.BotAPI, message *tgbotapi.Me
 	if err != nil {
 		return "", err
 	}
-	
+
 	user.MessageHandlersArray = GetReportStartHandlers()
 
 	return "Прием начальных данных о поездке. Пришлите фото или фото в виде файла с показаниями спидометра.", nil

@@ -25,7 +25,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 	reqMsgLowerCase := strings.ToLower(requestMsg)
 	if strings.Contains(reqMsgLowerCase, "привет") || strings.Contains(reqMsgLowerCase, "доров") ||
 		strings.Contains(reqMsgLowerCase, "добрый день") || strings.Contains(requestMsg, "/start") {
-		return "Добрый день. Я бот, принимающий данные о командировке. Напишите /help", nil
+		return "Добрый день. Я бот, принимающий данные о пробеге в начале и в конце поездки. Напишите /help", nil
 	}
 
 	if requestMsg == "/help" {
@@ -92,9 +92,9 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 		if tripInfoID != 0 {
 			user.TripInfo.NotFinishedTripInfoID = tripInfoID
 			user.MessageHandlersArray = GetReportChoiceHandlers()
-			return "Найдена незавершенная запись о поездке.\n"+
-				"Хотите ввести для нее конечные данные? /add_finish_info\n"+
-				"Хотите ввести начальные данные о новой поездке? /add_new_start_info", nil
+			return "Найдена незавершенная запись о поездке.\n" +
+				"Хотите ввести для нее конечные данные? /finish_info\n" +
+				"Хотите ввести начальные данные о новой поездке? /new_start_info", nil
 		}
 
 		user.MessageHandlersArray = GetReportStartHandlers()

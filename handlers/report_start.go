@@ -25,10 +25,8 @@ func GetPhotoOrFile(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *model
 	}
 
 	if message.Document != nil {
-		fmt.Println("have document")
 		user.TripInfo.TelegramFileID = message.Document.FileID
 	} else {
-		fmt.Println("have photo")
 		user.TripInfo.TelegramFileID = (*message.Photo)[0].FileID
 	}
 
@@ -70,8 +68,7 @@ func GetAnswerToWriteTripInfoStart(bot *tgbotapi.BotAPI, message *tgbotapi.Messa
 		return "", nil
 	}
 
-	// filePath := "/home/lev/Documents/ImageReceiverBotDocuments/" + user.FullName + "/" + time.Now().Format("01_02_2006_15_04_05")
-	filePath , err := infrastructure.NewUserFile(fileBytes, user.FullName, time.Now().Format("01_02_2006_15_04_05"))
+	filePath, err := infrastructure.NewUserFile(fileBytes, user.FullName+"/Начало поездки", time.Now().Format("01_02_2006_15_04_05"))
 	if err != nil {
 		return "", err
 	}

@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -17,7 +16,6 @@ func GetFileFromTelegramByFileID(bot *tgbotapi.BotAPI, fileID string) ([]byte, e
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(getFileURL)
 
 	resp, err := http.Get(getFileURL)
 	if err != nil {
@@ -33,16 +31,16 @@ func GetFileFromTelegramByFileID(bot *tgbotapi.BotAPI, fileID string) ([]byte, e
 }
 
 func NewUserFile(fileBytes []byte, fileFolder string, fileName string) (string, error) {
-	folderPath := pathPrefix+fileFolder
-	
+	folderPath := pathPrefix + fileFolder
+
 	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 		err = os.MkdirAll(folderPath, 0777)
 		if err != nil {
 			return "", err
 		}
 	}
-	
-	filePath := folderPath+"/"+fileName
+
+	filePath := folderPath + "/" + fileName
 	newFile, err := os.Create(filePath)
 	if err != nil {
 		return "", err
