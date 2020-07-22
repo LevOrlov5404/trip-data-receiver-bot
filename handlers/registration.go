@@ -18,7 +18,7 @@ func GetRegistrationHandlers() []models.UserMessageHandler {
 	}
 	return registrationHandlers
 }
-func GetFullNameToRegistrate(message *tgbotapi.Message, user *models.User) (string, error) {
+func GetFullNameToRegistrate(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *models.User) (string, error) {
 	if message.Text == "" {
 		return handleFail(user)
 	}
@@ -29,29 +29,11 @@ func GetFullNameToRegistrate(message *tgbotapi.Message, user *models.User) (stri
 		return handleFail(user)
 	}
 
-	db, err := repository.ConnectToDB()
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
-
-	dbUser, err := repository.GetUser(db, user.ID)
-	if err != nil {
-		return "", err
-	}
-
-	if dbUser != nil {
-		user.FullName = *dbUser.FullName
-		user.MessageHandlerNum = len(user.MessageHandlersArray)
-		user.Registrated = true
-		return "Проверил, вы есть в базе. Значит вы уже зарегистрированы.", nil
-	}
-
 	user.FullName = message.Text
 
 	return "Введите пароль для регистрации", nil
 }
-func GetPasswordToRegistrate(message *tgbotapi.Message, user *models.User) (string, error) {
+func GetPasswordToRegistrate(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *models.User) (string, error) {
 	if message.Text == "" || message.Text != "12345" {
 		return handleFail(user)
 	}
@@ -69,7 +51,7 @@ func GetPasswordToRegistrate(message *tgbotapi.Message, user *models.User) (stri
 
 	user.Registrated = true
 
-	return "Вы успешно зарегистрированы", nil
+	return fmt.Sprintf("%s, вы успешно зарегистрированы. Отправить данные о поездке: /report", user.FullName), nil
 }
 func handleFail(user *models.User) (string, error) {
 	user.CurrentFail++

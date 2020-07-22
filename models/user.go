@@ -5,14 +5,21 @@ import (
 )
 
 type (
-	UserMessageHandler func(message *tgbotapi.Message, user *User) (string, error)
-	User               struct {
+	UserMessageHandler func(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *User) (string, error)
+	UserTripInfo       struct {
+		NotFinishedTripInfoID int64
+		TelegramFileID        string
+		Km                    int
+	}
+	User struct {
 		ID                   int
 		Registrated          bool
 		FullName             string
 		CurrentFail          int
 		MessageHandlersArray []UserMessageHandler
 		MessageHandlerNum    int
+		TripInfo             UserTripInfo
+		FullNameToChange     string
 	}
 	Users map[int]*User
 )

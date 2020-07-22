@@ -1,78 +1,97 @@
 package handlers
 
-// import (
-// 	"fmt"
-// 	"strings"
+import (
+	"fmt"
+	"strings"
+	"time"
 
-// 	"github.com/LevOrlov5404/trip-data-receiver-bot/infrastructure"
-// 	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
-// 	"github.com/LevOrlov5404/trip-data-receiver-bot/repository"
-// 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-// )
+	"github.com/LevOrlov5404/trip-data-receiver-bot/infrastructure"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/repository"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+)
 
-// var reportStartHandlers []models.UserMessageHandler
+var reportStartHandlers []models.UserMessageHandler
 
-// func GetReportStartHandlers() []models.UserMessageHandler {
-// 	if reportStartHandlers == nil {
-// 		initReportStartHandlers()
-// 	}
-// 	return reportStartHandlers
-// }
-// func GetFullNameToRegistrate(message *tgbotapi.Message, user *models.User) (string, error) {
-// 	if message.Text == "" {
-// 		return handleFail(user)
-// 	}
+func GetReportStartHandlers() []models.UserMessageHandler {
+	if reportStartHandlers == nil {
+		initReportStartHandlers()
+	}
+	return reportStartHandlers
+}
+func GetPhotoOrFile(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *models.User) (string, error) {
+	if (message.Document == nil && message.Photo == nil) || message.Text != "" {
+		return handleFail(user)
+	}
 
-// 	msgParts := strings.Split(message.Text, " ")
-// 	if len(msgParts) != 3 || !infrastructure.CheckStrHasOnlyRuSymbols(msgParts[0]) ||
-// 		!infrastructure.CheckStrHasOnlyRuSymbols(msgParts[1]) || !infrastructure.CheckStrHasOnlyRuSymbols(msgParts[2]) {
-// 		return handleFail(user)
-// 	}
+	if message.Document != nil {
+		fmt.Println("have document")
+		user.TripInfo.TelegramFileID = message.Document.FileID
+	} else {
+		fmt.Println("have photo")
+		user.TripInfo.TelegramFileID = (*message.Photo)[0].FileID
+	}
 
-// 	db, err := repository.ConnectToDB()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	defer db.Close()
+	return "Принял ваше фото. Теперь введите пробег (км, целое число).", nil
+}
+func GetKm(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *models.User) (string, error) {
+	if message.Text == "" {
+		return handleFail(user)
+	}
 
-// 	dbUser, err := repository.GetUser(db, user.ID)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	km, ok := infrastructure.GetIntFromString(message.Text)
+	if !ok || km < 0 {
+		return handleFail(user)
+	}
 
-// 	if dbUser != nil {
-// 		user.FullName = *dbUser.FullName
-// 		user.MessageHandlerNum = len(user.MessageHandlersArray)
-// 		user.Registrated = true
-// 		return "Проверил, вы есть в базе. Значит вы уже зарегистрированы.", nil
-// 	}
+	user.TripInfo.Km = km
 
-// 	user.FullName = message.Text
+	return fmt.Sprintf("%s, принял ваш пробег: %d. Записать данные? /yes  |  /no", user.FullName, km), nil
+}
+func GetAnswerToWriteTripInfoStart(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *models.User) (string, error) {
+	if message.Text == "" {
+		return handleFail(user)
+	}
 
-// 	return "Введите пароль для регистрации", nil
-// }
-// func GetPasswordToRegistrate(message *tgbotapi.Message, user *models.User) (string, error) {
-// 	if message.Text == "" || message.Text != "12345" {
-// 		return handleFail(user)
-// 	}
+	answer := strings.ToLower(message.Text)
+	if answer != "/yes" && answer != "/no" {
+		return handleFail(user)
+	}
 
-// 	db, err := repository.ConnectToDB()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	defer db.Close()
+	if answer == "/no" {
+		user.TripInfo.NotFinishedTripInfoID = 0
+		user.TripInfo.TelegramFileID = ""
+		user.TripInfo.Km = 0
+		return "Сбросил данные. Снова отправить данные о поездке: /report", nil
+	}
 
-// 	err = repository.AddUser(db, user.ID, user.FullName)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	fileBytes, err := infrastructure.GetFileFromTelegramByFileID(bot, user.TripInfo.TelegramFileID)
+	if err != nil {
+		return "", nil
+	}
 
-// 	user.Registrated = true
+	// filePath := "/home/lev/Documents/ImageReceiverBotDocuments/" + user.FullName + "/" + time.Now().Format("01_02_2006_15_04_05")
+	filePath , err := infrastructure.NewUserFile(fileBytes, user.FullName, time.Now().Format("01_02_2006_15_04_05"))
+	if err != nil {
+		return "", err
+	}
 
-// 	return "Вы успешно зарегистрированы", nil
-// }
-// func initReportStartHandlers() {
-// 	reportStartHandlers = []models.UserMessageHandler{}
-// 	reportStartHandlers = append(registrationHandlers, GetFullNameToRegistrate)
-// 	reportStartHandlers = append(registrationHandlers, GetPasswordToRegistrate)
-// }
+	db, err := repository.ConnectToDB()
+	if err != nil {
+		return "", err
+	}
+	defer db.Close()
+
+	err = repository.AddTripInfoStart(db, user.ID, time.Now(), user.TripInfo.Km, filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return "Записал начальные данные о поездке. Доброго пути!", nil
+}
+func initReportStartHandlers() {
+	reportStartHandlers = []models.UserMessageHandler{}
+	reportStartHandlers = append(reportStartHandlers, GetPhotoOrFile)
+	reportStartHandlers = append(reportStartHandlers, GetKm)
+	reportStartHandlers = append(reportStartHandlers, GetAnswerToWriteTripInfoStart)
+}

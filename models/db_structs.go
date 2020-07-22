@@ -1,6 +1,6 @@
 package models
 
 type DbUser struct {
-	TelegramId *int
+	TelegramID *int
 	FullName   *string
 }
