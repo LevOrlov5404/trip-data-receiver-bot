@@ -68,7 +68,7 @@ func GetAnswerToWriteTripInfoStart(bot *tgbotapi.BotAPI, message *tgbotapi.Messa
 		return "", nil
 	}
 
-	filePath, err := infrastructure.NewUserFile(fileBytes, user.FullName+"/Начало поездки", time.Now().Format("01_02_2006_15_04_05"))
+	filePath, err := infrastructure.NewUserFile(fileBytes, user.FullName+"/Начало поездки", time.Now().Format("02_01_2006_15_04_05"))
 	if err != nil {
 		return "", err
 	}
