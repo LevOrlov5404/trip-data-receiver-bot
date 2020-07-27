@@ -9,7 +9,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-const pathPrefix = "/home/lev/Documents/ImageReceiverBotDocuments/"
+const pathPrefix = "./images/"
 
 func GetFileFromTelegramByFileID(bot *tgbotapi.BotAPI, fileID string) ([]byte, error) {
 	getFileURL, err := bot.GetFileDirectURL(fileID)

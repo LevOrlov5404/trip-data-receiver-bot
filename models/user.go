@@ -1,6 +1,8 @@
 package models
 
 import (
+	"sync"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -20,6 +22,7 @@ type (
 		MessageHandlerNum    int
 		TripInfo             UserTripInfo
 		FullNameToChange     string
+		Mux                  sync.Mutex
 	}
 	Users map[int]*User
 )

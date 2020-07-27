@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	host     string = "localhost"
+	host     string = "172.17.0.2"//"localhost"
 	port     int    = 5432
 	user     string = "bot_user"
 	password string = "12345"
