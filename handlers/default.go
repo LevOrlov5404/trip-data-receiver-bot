@@ -9,16 +9,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-// type smth struct {
-// 	lol UserMessageHandler
-// }
-
-// var (
-// 	smth_lol smth = smth{
-// 		lol: GetFullNameToRegistrate,
-// 	}
-// )
-
 func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, error) {
 	requestMsg := message.Text
 
@@ -36,10 +26,6 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 	}
 
 	if requestMsg == "/reg" {
-		if user.Registrated {
-			return "Вы уже зарегистрированы.", nil
-		}
-
 		db, err := repository.ConnectToDB()
 		if err != nil {
 			return "", err
@@ -53,13 +39,22 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 
 		if dbUser != nil {
 			user.FullName = *dbUser.FullName
+
+			blockedStatus, err := repository.GetUserIsBlockedStatus(db, user.ID)
+			if err != nil {
+				return "", err
+			}
+
+			if blockedStatus {
+				return fmt.Sprintf("%s, вы заблокированы.", user.FullName), nil
+			}
+
 			user.MessageHandlerNum = len(user.MessageHandlersArray)
-			user.Registrated = true
+
 			return fmt.Sprintf("%s, проверил, вы уже зарегистрированы. Отправить данные о поездке: /report", user.FullName), nil
 		}
 
 		user.MessageHandlersArray = GetRegistrationHandlers()
-		// user.MessageHandlerNum = 0 ?
 
 		return "Регистрация. Напишите ФИО (через пробел, по-русски).", nil
 	}
@@ -71,17 +66,24 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 		}
 		defer db.Close()
 
-		if !user.Registrated {
-			dbUser, err := repository.GetUser(db, user.ID)
-			if err != nil {
-				return "", err
-			}
+		dbUser, err := repository.GetUser(db, user.ID)
+		if err != nil {
+			return "", err
+		}
 
-			if dbUser == nil {
-				return "Похоже вы не зарегистрированы. Пройдите процедуру регистрации: /reg", nil
-			}
-			user.FullName = *dbUser.FullName
-			user.Registrated = true
+		if dbUser == nil {
+			return "Похоже вы не зарегистрированы. Пройдите процедуру регистрации: /reg", nil
+		}
+
+		user.FullName = *dbUser.FullName
+
+		blockedStatus, err := repository.GetUserIsBlockedStatus(db, user.ID)
+		if err != nil {
+			return "", err
+		}
+
+		if blockedStatus {
+			return fmt.Sprintf("%s, вы заблокированы.", user.FullName), nil
 		}
 
 		tripInfoID, err := repository.GetNotFininishedTripInfoID(db, user.ID)
@@ -109,17 +111,24 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 		}
 		defer db.Close()
 
-		if !user.Registrated {
-			dbUser, err := repository.GetUser(db, user.ID)
-			if err != nil {
-				return "", err
-			}
+		dbUser, err := repository.GetUser(db, user.ID)
+		if err != nil {
+			return "", err
+		}
 
-			if dbUser == nil {
-				return "Похоже вы не зарегистрированы. Пройдите процедуру регистрации: /reg", nil
-			}
-			user.FullName = *dbUser.FullName
-			user.Registrated = true
+		if dbUser == nil {
+			return "Похоже вы не зарегистрированы. Пройдите процедуру регистрации: /reg", nil
+		}
+
+		user.FullName = *dbUser.FullName
+
+		blockedStatus, err := repository.GetUserIsBlockedStatus(db, user.ID)
+		if err != nil {
+			return "", err
+		}
+
+		if blockedStatus {
+			return fmt.Sprintf("%s, вы заблокированы.", user.FullName), nil
 		}
 
 		user.MessageHandlersArray = GetChangeNameHandlers()
@@ -127,5 +136,5 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 		return "Смена ФИО. Напишите ФИО (через пробел, по-русски).", nil
 	}
 
-	return /*"Не знаю, как ответить"*/ "", nil
+	return "", nil
 }

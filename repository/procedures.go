@@ -7,6 +7,30 @@ import (
 	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
 )
 
+func GetPassword(db *sql.DB) (string, error) {
+	rows, err := db.Query("select * from registration_password_get_latest()")
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+
+	password := ""
+	if rows.Next() {
+		err := rows.Scan(&password)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		return "", nil
+	}
+
+	if err = rows.Err(); err != nil {
+		return "", err
+	}
+
+	return password, err
+}
+
 func GetUser(db *sql.DB, userTelegramID int) (*models.DbUser, error) {
 	rows, err := db.Query("select * from user_get($1)", userTelegramID)
 	if err != nil {
@@ -27,7 +51,32 @@ func GetUser(db *sql.DB, userTelegramID int) (*models.DbUser, error) {
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return &dbUser, nil
+}
+
+func GetUserIsBlockedStatus(db *sql.DB, userTelegramID int) (bool, error) {
+	rows, err := db.Query("select * from user_get_is_blocked_status($1)", userTelegramID)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	isBlockedStatus := false
+	if rows.Next() {
+		err := rows.Scan(&isBlockedStatus)
+		if err != nil {
+			return false, err
+		}
+	} else {
+		return false, nil
+	}
+
+	if err = rows.Err(); err != nil {
+		return false, err
+	}
+
+	return isBlockedStatus, nil
 }
 
 func AddUser(db *sql.DB, userTelegramID int, userFullName string) error {
@@ -86,6 +135,7 @@ func GetNotFininishedTripInfoID(db *sql.DB, userTelegramID int) (int64, error) {
 	if err = rows.Err(); err != nil {
 		return 0, err
 	}
+
 	return tripInfoID, nil
 }
 
@@ -118,5 +168,6 @@ func GetKmDifferenceByTripInfoID(db *sql.DB, tripInfoID int64) (int, error) {
 	if err = rows.Err(); err != nil {
 		return 0, err
 	}
+
 	return kmDifference, nil
 }

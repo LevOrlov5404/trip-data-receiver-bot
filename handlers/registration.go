@@ -34,7 +34,7 @@ func GetFullNameToRegistrate(bot *tgbotapi.BotAPI, message *tgbotapi.Message, us
 	return "Введите пароль для регистрации", nil
 }
 func GetPasswordToRegistrate(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user *models.User) (string, error) {
-	if message.Text == "" || message.Text != "12345" {
+	if message.Text == "" {
 		return handleFail(user)
 	}
 
@@ -44,12 +44,19 @@ func GetPasswordToRegistrate(bot *tgbotapi.BotAPI, message *tgbotapi.Message, us
 	}
 	defer db.Close()
 
-	err = repository.AddUser(db, user.ID, user.FullName)
+	password, err := repository.GetPassword(db)
 	if err != nil {
 		return "", err
 	}
 
-	user.Registrated = true
+	if message.Text != password {
+		return handleFail(user)
+	}
+
+	err = repository.AddUser(db, user.ID, user.FullName)
+	if err != nil {
+		return "", err
+	}
 
 	return fmt.Sprintf("%s, вы успешно зарегистрированы. Отправить данные о поездке: /report", user.FullName), nil
 }

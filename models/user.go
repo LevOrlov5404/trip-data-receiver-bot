@@ -15,7 +15,6 @@ type (
 	}
 	User struct {
 		ID                   int
-		Registrated          bool
 		FullName             string
 		CurrentFail          int
 		MessageHandlersArray []UserMessageHandler

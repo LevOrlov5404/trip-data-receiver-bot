@@ -29,26 +29,9 @@ func main() {
 	// }
 	// defer db.Close()
 
-	// err = repository.AddTripInfoStart(db, 0, time.Now(), 123, "lol")
+	// status, err := repository.GetUserIsBlockedStatus(db, 0)
 	// fmt.Println(err)
-	// err = repository.TripInfoFinishAdd(db, 5, time.Now(), 123, "lol")
-	// fmt.Println(err)
-	// tripInfoID, err := repository.GetNotFininishedTripInfoID(db, 1)
-	// fmt.Println(err)
-	// fmt.Println(tripInfoID)
-	// err = repository.SetFinishedToTripInfo(db, 9223372036854775807)
-	// fmt.Println(err)
-	// kmDifference, err := repository.GetKmDifferenceByTripInfoID(db, 9223372036854775807)
-	// fmt.Println(err)
-	// fmt.Println(kmDifference)
-
-	// err = repository.AddUser(db, 0, "levchik")
-	// fmt.Println(err)
-	// err = repository.SetUserName(db, 2, "test2")
-	// fmt.Println(err)
-	// dbUser, err := repository.GetUser(db, 0)
-	// fmt.Println(err)
-	// fmt.Println(dbUser)
+	// fmt.Println(status)
 	// return
 
 	users := models.Users{}

@@ -10,7 +10,7 @@ var (
 	port     int    = 5432
 	user     string = "bot_user"
 	password string = "12345"
-	dbname   string = "trip-data"
+	dbname   string = "trip_data"
 )
 
 func ConnectToDB() (*sql.DB, error) {
