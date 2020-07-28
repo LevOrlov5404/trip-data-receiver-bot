@@ -3,40 +3,21 @@ package main
 import (
 	"log"
 
+	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/models"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/repository"
 	"github.com/LevOrlov5404/trip-data-receiver-bot/handlers"
-	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/infrastructure"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	_ "github.com/lib/pq"
 )
 
-const (
-	telegramBotToken string = "1273007508:AAH_hqU_qFimVVv1OW5jYdJmgbfqhCr-2-g"
-)
-
-func sendMessageToChatId(bot *tgbotapi.BotAPI, message string, chatID int64) {
-	msg := tgbotapi.NewMessage(chatID, message)
-	_, err := bot.Send(msg)
-	if err != nil {
-		log.Printf("не удалось отправить сообщение по причине: %v", err)
-	}
-}
-
 func main() {
-	// db, err := repository.ConnectToDB()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// defer db.Close()
-
-	// status, err := repository.GetUserIsBlockedStatus(db, 0)
-	// fmt.Println(err)
-	// fmt.Println(status)
-	// return
-
+	config := infrastructure.ReadConfig()
 	users := models.Users{}
 
-	bot, err := tgbotapi.NewBotAPI(telegramBotToken)
+	repository.InitConnectionString(config.PostgresDb)
+
+	bot, err := tgbotapi.NewBotAPI(config.TelegramBotToken)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -91,7 +72,7 @@ func main() {
 				}
 
 				if replyMsg != "" {
-					sendMessageToChatId(bot, replyMsg, update.Message.Chat.ID)
+					infrastructure.SendMessageToChatID(bot, replyMsg, update.Message.Chat.ID)
 				}
 
 				user.Mux.Unlock()

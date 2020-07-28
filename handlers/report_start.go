@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/models"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/repository"
 	"github.com/LevOrlov5404/trip-data-receiver-bot/infrastructure"
-	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
-	"github.com/LevOrlov5404/trip-data-receiver-bot/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 

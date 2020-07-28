@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/models"
 )
 
 func GetPassword(db *sql.DB) (string, error) {

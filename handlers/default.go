@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LevOrlov5404/trip-data-receiver-bot/models"
-	"github.com/LevOrlov5404/trip-data-receiver-bot/repository"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/models"
+	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
