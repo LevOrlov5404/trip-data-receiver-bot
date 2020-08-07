@@ -63,7 +63,7 @@ func NewUserFile(fileBytes []byte, fileFolder string, fileName string) (string, 
 		}
 	}
 
-	filePath := folderPath + "/" + fileName + ".jpeg"
+	filePath := folderPath + "/" + fileName + ".jpg"
 	newFile, err := os.Create(filePath)
 	if err != nil {
 		return "", err
