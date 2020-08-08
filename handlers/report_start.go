@@ -73,13 +73,7 @@ func GetAnswerToWriteTripInfoStart(bot *tgbotapi.BotAPI, message *tgbotapi.Messa
 		return "", err
 	}
 
-	db, err := repository.ConnectToDB()
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
-
-	err = repository.AddTripInfoStart(db, user.ID, time.Now(), user.TripInfo.Km, filePath)
+	err = repository.AddTripInfoStart(user.ID, time.Now(), user.TripInfo.Km, filePath)
 	if err != nil {
 		return "", err
 	}

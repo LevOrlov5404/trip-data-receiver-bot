@@ -48,13 +48,7 @@ func GetAnswerToChangeName(bot *tgbotapi.BotAPI, message *tgbotapi.Message, user
 		return fmt.Sprintf("ФИО осталось прежнее: %s.", user.FullName), nil
 	}
 
-	db, err := repository.ConnectToDB()
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
-
-	err = repository.SetUserName(db, user.ID, user.FullNameToChange)
+	err := repository.SetUserName(user.ID, user.FullNameToChange)
 	if err != nil {
 		return "", err
 	}

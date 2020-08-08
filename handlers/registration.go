@@ -38,13 +38,7 @@ func GetPasswordToRegistrate(bot *tgbotapi.BotAPI, message *tgbotapi.Message, us
 		return handleFail(user)
 	}
 
-	db, err := repository.ConnectToDB()
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
-
-	password, err := repository.GetPassword(db)
+	password, err := repository.GetPassword()
 	if err != nil {
 		return "", err
 	}
@@ -53,7 +47,7 @@ func GetPasswordToRegistrate(bot *tgbotapi.BotAPI, message *tgbotapi.Message, us
 		return handleFail(user)
 	}
 
-	err = repository.AddUser(db, user.ID, user.FullName)
+	err = repository.AddUser(user.ID, user.FullName)
 	if err != nil {
 		return "", err
 	}

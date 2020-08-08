@@ -26,13 +26,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 	}
 
 	if requestMsg == "/reg" {
-		db, err := repository.ConnectToDB()
-		if err != nil {
-			return "", err
-		}
-		defer db.Close()
-
-		dbUser, err := repository.GetUser(db, user.ID)
+		dbUser, err := repository.GetUser(user.ID)
 		if err != nil {
 			return "", err
 		}
@@ -40,7 +34,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 		if dbUser != nil {
 			user.FullName = *dbUser.FullName
 
-			blockedStatus, err := repository.GetUserIsBlockedStatus(db, user.ID)
+			blockedStatus, err := repository.GetUserIsBlockedStatus(user.ID)
 			if err != nil {
 				return "", err
 			}
@@ -60,13 +54,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 	}
 
 	if requestMsg == "/report" {
-		db, err := repository.ConnectToDB()
-		if err != nil {
-			return "", err
-		}
-		defer db.Close()
-
-		dbUser, err := repository.GetUser(db, user.ID)
+		dbUser, err := repository.GetUser(user.ID)
 		if err != nil {
 			return "", err
 		}
@@ -77,7 +65,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 
 		user.FullName = *dbUser.FullName
 
-		blockedStatus, err := repository.GetUserIsBlockedStatus(db, user.ID)
+		blockedStatus, err := repository.GetUserIsBlockedStatus(user.ID)
 		if err != nil {
 			return "", err
 		}
@@ -86,7 +74,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 			return fmt.Sprintf("%s, вы заблокированы.", user.FullName), nil
 		}
 
-		tripInfoID, err := repository.GetNotFininishedTripInfoID(db, user.ID)
+		tripInfoID, err := repository.GetNotFininishedTripInfoID(user.ID)
 		if err != nil {
 			return "", err
 		}
@@ -105,13 +93,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 	}
 
 	if requestMsg == "/change_name" {
-		db, err := repository.ConnectToDB()
-		if err != nil {
-			return "", err
-		}
-		defer db.Close()
-
-		dbUser, err := repository.GetUser(db, user.ID)
+		dbUser, err := repository.GetUser(user.ID)
 		if err != nil {
 			return "", err
 		}
@@ -122,7 +104,7 @@ func HandleTextMessage(message *tgbotapi.Message, user *models.User) (string, er
 
 		user.FullName = *dbUser.FullName
 
-		blockedStatus, err := repository.GetUserIsBlockedStatus(db, user.ID)
+		blockedStatus, err := repository.GetUserIsBlockedStatus(user.ID)
 		if err != nil {
 			return "", err
 		}

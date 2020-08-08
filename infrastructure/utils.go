@@ -25,7 +25,6 @@ func ReadConfig() models.Config {
 
 	return config
 }
-
 func SendMessageToChatID(bot *tgbotapi.BotAPI, message string, chatID int64) {
 	msg := tgbotapi.NewMessage(chatID, message)
 	_, err := bot.Send(msg)
@@ -33,7 +32,6 @@ func SendMessageToChatID(bot *tgbotapi.BotAPI, message string, chatID int64) {
 		log.Printf("не удалось отправить сообщение по причине: %v", err)
 	}
 }
-
 func GetFileFromTelegramByFileID(bot *tgbotapi.BotAPI, fileID string) ([]byte, error) {
 	getFileURL, err := bot.GetFileDirectURL(fileID)
 	if err != nil {
@@ -52,7 +50,6 @@ func GetFileFromTelegramByFileID(bot *tgbotapi.BotAPI, fileID string) ([]byte, e
 	}
 	return bodyBytes, nil
 }
-
 func NewUserFile(fileBytes []byte, fileFolder string, fileName string) (string, error) {
 	folderPath := pathPrefix + fileFolder
 
@@ -75,9 +72,9 @@ func NewUserFile(fileBytes []byte, fileFolder string, fileName string) (string, 
 		return "", err
 	}
 
+
 	return filePath, nil
 }
-
 func GetIntFromString(s string) (int, bool) {
 	i, err := strconv.Atoi(s)
 	if err != nil {

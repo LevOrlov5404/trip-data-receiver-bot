@@ -1,13 +1,12 @@
 package repository
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/LevOrlov5404/trip-data-receiver-bot/domain/models"
 )
 
-func GetPassword(db *sql.DB) (string, error) {
+func GetPassword() (string, error) {
 	rows, err := db.Query("select * from registration_password_get_latest()")
 	if err != nil {
 		return "", err
@@ -31,7 +30,7 @@ func GetPassword(db *sql.DB) (string, error) {
 	return password, err
 }
 
-func GetUser(db *sql.DB, userTelegramID int) (*models.DbUser, error) {
+func GetUser(userTelegramID int) (*models.DbUser, error) {
 	rows, err := db.Query("select * from user_get($1)", userTelegramID)
 	if err != nil {
 		return nil, err
@@ -55,7 +54,7 @@ func GetUser(db *sql.DB, userTelegramID int) (*models.DbUser, error) {
 	return &dbUser, nil
 }
 
-func GetUserIsBlockedStatus(db *sql.DB, userTelegramID int) (bool, error) {
+func GetUserIsBlockedStatus(userTelegramID int) (bool, error) {
 	rows, err := db.Query("select * from user_get_is_blocked_status($1)", userTelegramID)
 	if err != nil {
 		return false, err
@@ -79,7 +78,7 @@ func GetUserIsBlockedStatus(db *sql.DB, userTelegramID int) (bool, error) {
 	return isBlockedStatus, nil
 }
 
-func AddUser(db *sql.DB, userTelegramID int, userFullName string) error {
+func AddUser(userTelegramID int, userFullName string) error {
 	_, err := db.Exec("select * from user_add($1, $2)", userTelegramID, userFullName)
 	if err != nil {
 		return err
@@ -88,7 +87,7 @@ func AddUser(db *sql.DB, userTelegramID int, userFullName string) error {
 	return nil
 }
 
-func SetUserName(db *sql.DB, userTelegramID int, userFullName string) error {
+func SetUserName(userTelegramID int, userFullName string) error {
 	_, err := db.Exec("select * from user_set_name($1, $2)", userTelegramID, userFullName)
 	if err != nil {
 		return err
@@ -97,7 +96,7 @@ func SetUserName(db *sql.DB, userTelegramID int, userFullName string) error {
 	return nil
 }
 
-func AddTripInfoStart(db *sql.DB, userTelegramID int, date time.Time, km int, filePath string) error {
+func AddTripInfoStart(userTelegramID int, date time.Time, km int, filePath string) error {
 	_, err := db.Exec("select * from trip_info_start_add($1, $2, $3, $4)", userTelegramID, date, km, filePath)
 	if err != nil {
 		return err
@@ -106,7 +105,7 @@ func AddTripInfoStart(db *sql.DB, userTelegramID int, date time.Time, km int, fi
 	return nil
 }
 
-func AddTripInfoFinish(db *sql.DB, tripInfoID int64, date time.Time, km int, filePath string) error {
+func AddTripInfoFinish(tripInfoID int64, date time.Time, km int, filePath string) error {
 	_, err := db.Exec("select * from trip_info_finish_add($1, $2, $3, $4)", tripInfoID, date, km, filePath)
 	if err != nil {
 		return err
@@ -115,7 +114,7 @@ func AddTripInfoFinish(db *sql.DB, tripInfoID int64, date time.Time, km int, fil
 	return nil
 }
 
-func GetNotFininishedTripInfoID(db *sql.DB, userTelegramID int) (int64, error) {
+func GetNotFininishedTripInfoID(userTelegramID int) (int64, error) {
 	rows, err := db.Query("select * from get_not_finished_trip_info_id($1)", userTelegramID)
 	if err != nil {
 		return 0, err
@@ -139,7 +138,7 @@ func GetNotFininishedTripInfoID(db *sql.DB, userTelegramID int) (int64, error) {
 	return tripInfoID, nil
 }
 
-func SetFinishedToTripInfo(db *sql.DB, tripInfoID int64) error {
+func SetFinishedToTripInfo(tripInfoID int64) error {
 	_, err := db.Exec("select * from set_finished_to_trip_info($1)", tripInfoID)
 	if err != nil {
 		return err
@@ -148,7 +147,7 @@ func SetFinishedToTripInfo(db *sql.DB, tripInfoID int64) error {
 	return nil
 }
 
-func GetKmDifferenceByTripInfoID(db *sql.DB, tripInfoID int64) (int, error) {
+func GetKmDifferenceByTripInfoID(tripInfoID int64) (int, error) {
 	rows, err := db.Query("select * from get_km_difference_by_trip_info_id($1)", tripInfoID)
 	if err != nil {
 		return 0, err

@@ -33,13 +33,7 @@ func GetAnswerToContinueStartOrFinish(bot *tgbotapi.BotAPI, message *tgbotapi.Me
 		return "Прием конечных данных о поездке. Пришлите фото или фото в виде файла с показаниями спидометра.", nil
 	}
 
-	db, err := repository.ConnectToDB()
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
-
-	err = repository.SetFinishedToTripInfo(db, user.TripInfo.NotFinishedTripInfoID)
+	err := repository.SetFinishedToTripInfo(user.TripInfo.NotFinishedTripInfoID)
 	if err != nil {
 		return "", err
 	}

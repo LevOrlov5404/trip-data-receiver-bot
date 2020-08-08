@@ -15,7 +15,10 @@ func main() {
 	config := infrastructure.ReadConfig()
 	users := models.Users{}
 
-	repository.InitConnectionString(config.PostgresDb)
+	err := repository.InitDB(config.PostgresDb)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	bot, err := tgbotapi.NewBotAPI(config.TelegramBotToken)
 	if err != nil {

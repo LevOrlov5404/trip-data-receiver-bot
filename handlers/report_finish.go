@@ -46,18 +46,12 @@ func GetAnswerToWriteTripInfoFinish(bot *tgbotapi.BotAPI, message *tgbotapi.Mess
 		return "", err
 	}
 
-	db, err := repository.ConnectToDB()
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
-
-	err = repository.AddTripInfoFinish(db, user.TripInfo.NotFinishedTripInfoID, time.Now(), user.TripInfo.Km, filePath)
+	err = repository.AddTripInfoFinish(user.TripInfo.NotFinishedTripInfoID, time.Now(), user.TripInfo.Km, filePath)
 	if err != nil {
 		return "", err
 	}
 
-	kmDifference, err := repository.GetKmDifferenceByTripInfoID(db, user.TripInfo.NotFinishedTripInfoID)
+	kmDifference, err := repository.GetKmDifferenceByTripInfoID(user.TripInfo.NotFinishedTripInfoID)
 	if err != nil {
 		return "", err
 	}

@@ -6,9 +6,10 @@ type Config struct {
 }
 
 type PostgresDb struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	Name     string
+	Host         string
+	Port         int
+	User         string
+	Password     string
+	Name         string
+	MaxOpenConns int
 }
